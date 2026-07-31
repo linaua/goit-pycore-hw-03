@@ -1,0 +1,3 @@
+Olexander Antoniv,7000
+Oleg Kalyn,2000
+Igor Terletskiy,4000

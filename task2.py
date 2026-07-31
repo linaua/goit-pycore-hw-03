@@ -1,13 +1,31 @@
-import random
+import os
 
-def get_numbers_ticket(min, max, quantity):
-    numbers = []
-    
-    if min < 1 or max > 1000 or min > max or quantity < 1 or quantity > (max - min + 1):
-        print("Invalid input values.")
+def get_cats_info(path):
+    cats_info = []
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            cats = f.readlines()
+            
+        for cat in cats:
+            cat = cat.strip()
+            if not cat:
+                continue
+            try:
+                cat_id, name, age = cat.split(',')
+                cats_info.append({
+                    "id": cat_id,
+                    "name": name,
+                    "age": int(age) 
+                })
+            except (ValueError, IndexError):
+                print(f"Invalid data format for cat: {cat}")
+                continue
+
+    except FileNotFoundError:
+        print("File not found")
         return []
-    numbers = random.sample(range(min, max + 1), quantity)
-    return sorted(numbers)
 
-lottery_numbers = get_numbers_ticket(1, 1000, 5)
-print("Ваші лотерейні числа:", lottery_numbers)
+    return cats_info  
+
+cats_info = get_cats_info("cats.txt")
+print(cats_info)

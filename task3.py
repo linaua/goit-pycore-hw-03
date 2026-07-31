@@ -1,26 +1,29 @@
-import re
+import sys
+import colorama
+from colorama import Fore, Style
+from pathlib import Path
 
-raw_numbers = [
-    "067\\t123 4567",
-    "(095) 234-5678\\n",
-    "+380 44 123 4567",
-    "380501234567",
-    "    +38(050)123-32-34",
-    "     0503451234",
-    "(050)8889900",
-    "38050-111-22-22",
-    "38050 111 22 11   ",
-]
+colorama.init(autoreset=True)
 
-def normalize_phone(phone_number):
-    digits = re.sub(r'\D', '', phone_number)
-    if digits.startswith('380') and len(digits) == 12:
-        return '+' + digits
-    if digits.startswith('80') and len(digits) == 11:
-        return '+3' + digits
-    if digits.startswith('0') and len(digits) == 10:
-        return '+38' + digits
-    return '+' + digits
+def print_dir_structure(path: Path, indent: str = ""):
+    for item in path.iterdir():
+        if item.name.startswith('.'):
+            continue
+        if item.is_dir():
+            print(f"{indent}{Fore.BLUE}{item.name}/{Style.RESET_ALL}")
+            print_dir_structure(item, indent + "    ")
+        else:
+            print(f"{indent}{Fore.GREEN}{item.name}{Style.RESET_ALL}")
 
-sanitized_numbers = [normalize_phone(num) for num in raw_numbers]
-print("Нормалізовані номери телефонів для SMS-розсилки:", sanitized_numbers)
+if len(sys.argv) < 2:
+    print("Будь ласка, вкажіть шлях до директорії як аргумент командного рядка.")
+    sys.exit(2)
+
+path = Path(sys.argv[1]).resolve()
+
+if not path.is_dir():
+    print("Вказаний шлях не існує або не є директорією.")
+    sys.exit(2)
+
+print(f"{Fore.BLUE}{path.name}/{Style.RESET_ALL}")
+print_dir_structure(path, indent="    ")

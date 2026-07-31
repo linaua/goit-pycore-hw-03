@@ -1,33 +1,60 @@
-import datetime
+def parse_input(user_input):
+    cmd, *args = user_input.split()
+    cmd = cmd.strip().lower()
+    return cmd, *args
 
-def get_upcoming_birthdays(users):
-    today = datetime.datetime.now().date()
-    upcoming_birthdays = []
+def add_contact(args, contacts):
+    if len(args) < 2:
+        return "Error: Please provide both name and phone number."
+    name, phone = args
+    contacts[name] = phone
+    return "Contact added."
 
-    for user in users:
-        birthday_date = datetime.datetime.strptime(user["birthday"], "%Y.%m.%d").date()
-        birthday_this_year = birthday_date.replace(year=today.year)
-        if birthday_this_year < today:
-            birthday_this_year = birthday_this_year.replace(year=today.year + 1)
-        days_between = (birthday_this_year - today).days
-        if 0 <= days_between <= 7:
-            congratulation_date = birthday_this_year
-            if congratulation_date.weekday() == 5: # Субота
-                congratulation_date += datetime.timedelta(days=2)
-            elif congratulation_date.weekday() == 6: # Неділя
-                congratulation_date += datetime.timedelta(days=1)
-            upcoming_birthdays.append({
-            "name": user["name"],
-            "congratulation_date": congratulation_date.strftime("%Y.%m.%d")
-            })
+def change_contact(args, contacts):
+    if len(args) < 2:
+        return "Error: Please provide both name and new phone number."
+    name, new_phone = args
+    if name in contacts:
+        contacts[name] = new_phone
+        return "Contact updated."
+    return "Contact not found."
 
-    return upcoming_birthdays
+def show_phone(args, contacts):
+    if not args:
+        return "Error: Please provide a name."
+    name = args[0]
+    if name in contacts:
+        return contacts[name]
+    return "Contact not found."
 
-users = [
-    {"name": "Alice", "birthday": "2026.05.15"},
-    {"name": "Bob", "birthday": "2026.06.20"},
-    {"name": "Charlie", "birthday": "2026.04.10"},
-    {"name": "David", "birthday": "2026.07.25"},
-]
-upcoming_birthdays = get_upcoming_birthdays(users)
-print("Список привітань на цьому тижні:", upcoming_birthdays)
+def show_all(contacts):
+    if contacts:
+        return "\n".join(f"{name}: {phone}" for name, phone in contacts.items())
+    return "No contacts found."
+
+def main():
+    contacts = {}
+    print("Welcome to the assistant bot!")
+    while True:
+        user_input = input("Enter a command: ")
+        if not user_input.strip():
+            continue
+        command, *args = parse_input(user_input)
+        if command in ["close", "exit"]:
+            print("Good bye!")
+            break
+        elif command == "hello":
+            print("How can I help you?")
+        elif command == "add":
+            print(add_contact(args, contacts))
+        elif command == "change":
+            print(change_contact(args, contacts))
+        elif command == "phone":
+            print(show_phone(args, contacts))
+        elif command == "all":
+            print(show_all(contacts))
+        else:
+            print("Invalid command.")
+
+if __name__ == "__main__":
+    main()
